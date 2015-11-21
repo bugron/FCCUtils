@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>FreeCodeCamp's GitHub Notifications</title>
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="js/pace/pace.min.js"></script>
+    <link href="css/pace/pace-index.css" rel="stylesheet">
+	<script type="text/javascript" src="js/notifications/desktop-notify-min.js"></script>
+	<style>
+		* {
+			margin: 0;
+		}
+
+		body {
+			background: #fff url("img/wide-social-banner.png") no-repeat center center fixed; 
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			-o-background-size: cover;
+			background-size: cover;
+		}
+
+		header {
+			background-color: #4A2B0F;
+			font-family: monospace;
+			text-decoration: none;
+			text-align: center;
+			padding: 15px;
+			height: 30px;
+			color: #EEE;
+		}
+	</style>
+</head>
+
+<body>
+	<header>
+		<h1 id="count">FreeCodeCamp's GitHub Notifications</h1>
+	</header>
+
+	<div id="notifications"></div>
+
+	<script>
+		//TODO $("button.delete-note").closest("form").attr("action")
+		$(document).ready(function() {
+			var isSupported = notify.isSupported;
+			if(isSupported) {
+				var permissionLevel = notify.permissionLevel();
+	            if(permissionLevel === 'default') {
+	                permissionLevel = notify.requestPermission();
+	            }
+
+	            notify.config({pageVisibility: false, autoClose: 5000});
+	            
+	            function show(text) {
+	                notify.createNotification("FCC GitHub Notifications", {body:text, icon: "img/favicon.ico"});
+	            }
+	        }
+
+	        function getIssues(opts) {
+			    opts.data = opts.data || [];
+			    opts.page = opts.page || 1;
+			    var url = 'https://api.github.com/repos/' + opts.username + '/' + opts.repo;
+			    url += '/notifications?callback=?&page=' + opts.page;
+			    url += '&access_token=YOUR_TOKEN_HERE';
+			    $.ajax(url, {
+			        dataType: 'jsonp',
+			        success: function(res){
+			            if(res.meta && res.meta.status == '403'){
+			                return opts.error(res.data);
+			            }
+			            opts.data = $.merge(opts.data, res.data);
+			            if(res.meta && res.data.length === 50){
+		                    opts.page++; 
+		                    getIssues(opts);
+			            } else {
+							opts.success(opts.data);
+			            }
+			        }
+			    });
+			}
+
+			function check() {
+				setTimeout(function () {
+					getIssues({
+					    username: 'freecodecamp',
+					    repo: 'freecodecamp',
+					    success: function(issue) {
+							if(issue.length) {
+								$("#count").empty();
+								$("#count").text("You have " + issue.length + " unread notification" + (issue.length > 1 ? "s" : ""));
+								if(permissionLevel === 'granted' && isSupported) {
+									show("You have " + issue.length + " unread notification" + (issue.length > 1 ? "s" : ""));
+								}
+								//$("title").empty();
+								$('title').text("(" + issue.length + ") " + "FreeCodeCamp's GitHub Notifications");
+								$('#notifications').empty();
+						        $.each(issue, function(i, issue) {
+						            var html = '<p><a style="background-color:blue;color:white;" href="https://github.com/notifications/" target="_blank">' + issue.subject.title + '</a></p>';
+						            $('#notifications').append(html);
+						        });
+					        } else {
+					            $('title').text("FreeCodeCamp's GitHub Notifications");
+					            $("#count").text("FreeCodeCamp's GitHub Notifications");
+					            $("#notifications").empty();
+					        }
+					    },
+					    error: function(jqXHR, textStatus, errorThrown) {
+						    console.log("Request failed: " + textStatus);
+						    console.log(errorThrown);
+						}
+					});
+					check();
+				}, 2000)
+			}
+
+			check();
+		});
+	</script>
+</body>
+</html>

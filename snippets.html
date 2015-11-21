@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>FreeCodeCamp Issues Snippets</title>
+
+  <link href="css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+  <nav class="light-blue lighten-1">
+    <div class="row center">
+		<span class="header">FreeCodeCamp Issues Snippets</span>
+    </div>
+  </nav> 
+
+<div class="row">
+	<div class="col s12 m4 card-panel hoverable">
+	<div class="center title">Snippet 1 - basic</div>
+<pre class="copyText">
+@UserName thanks for posting this issue!
+Note that your issue is a duplicate:
+
+>***
+>Please review the [**Guidelines for Contributing**](https://github.com/FreeCodeCamp/FreeCodeCamp/blob/staging/CONTRIBUTING.md), thank you!.
+>***
+</pre>
+	</div>
+
+	<div class="col s12 m4 card-panel hoverable">
+	<div class="center title">Snippet 2 - most used</div>
+<pre class="copyText">
+@UserName thank you for pointing this out! You can continue further discussion there. Feel free to reopen if you still experience problems, thanks.
+Closing. Please feel free to re-open with steps to reproduce the issue. @UserName if your problem is solved feel free to close this issue, thanks!
+@UserName, please, provide the description of your issue/code/screenshot, thanks!
+[We officially support only Chrome browser](https://github.com/FreeCodeCamp/FreeCodeCamp/issues/2942#issuecomment-136591448).
+[Beginner’s Guide to Easy Contributions to Free Code Camp](https://natacseanc.wordpress.com/2015/09/07/beginners-guide-to-easy-contributions-to-free-code-camp/).
+If you have problems with your code, please, post a message in our [Gitter chat room](https://github.com/FreeCodeCamp/FreeCodeCamp/wiki/How-to-Get-Help-on-Gitter) first, thanks.
+[Labels for issues](https://github.com/FreeCodeCamp/FreeCodeCamp/issues/3371)
+</pre>
+	</div>
+
+    <div class="col s12 m4 card-panel hoverable">
+    <div class="center title">Snippet 3 - additional</div>
+<pre class="copyText">
+@UserName thanks for posting this issue!
+See @benmcmahon100's [comment](https://github.com/FreeCodeCamp/FreeCodeCamp/issues/2649#event-391484202) and my [comment](https://github.com/FreeCodeCamp/FreeCodeCamp/issues/2773#issuecomment-135506542).
+Try to [Refresh Your Browser Cache](https://github.com/FreeCodeCamp/FreeCodeCamp/wiki/Refresh-Your-Browser-Cache) and [Clear Your Browser's Local Storage](https://github.com/FreeCodeCamp/FreeCodeCamp/wiki/Clear-Your-Browser%27s-Local-Storage).
+</pre>
+    </div>
+
+</div>
+
+  <!--  Scripts-->
+  <script src="js/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.min.js"></script>
+  <script>
+  $(document).ready(function () {
+     $.fn.OneClickSelect = function(){
+      return $(this).on('click',function(){
+        
+         var range, selection;
+         if (window.getSelection) {
+            selection = window.getSelection();   
+            range = document.createRange();  
+            range.selectNodeContents(this);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        } else if (document.body.createTextRange) {
+            range = document.body.createTextRange();
+            alert(range);
+            range.moveToElementText(this);
+            range.select();
+        }
+      });
+    };
+    
+    // Apply to these elements
+    $('.copyText').OneClickSelect();
+  });
+  </script>
+
+  </body>
+</html>

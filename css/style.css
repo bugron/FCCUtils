@@ -1,0 +1,57 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+.icon-block {
+  padding: 0 15px;
+}
+.icon-block .material-icons {
+	font-size: inherit;
+}
+
+pre {
+  white-space: pre-wrap;       /* CSS 3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  -ms-word-break: break-all;
+
+   /* Be VERY careful with this, breaks normal words wh_erever */
+  word-break: break-all;
+
+   /* Non standard for webkit */
+  word-break: break-word;
+
+  -webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	   hyphens: auto;
+   overflow-x: hidden;
+}
+  
+.header {
+  font-size: 1.5em;
+}
+
+.copyText {
+  opacity: 0.3;
+}
+
+.hoverable:hover .copyText {
+  opacity: 1;
+}
+
+.row .card-panel:nth-child(1) .title {
+	background-color: #a5d6a7;
+}
+
+.row .card-panel:nth-child(2) .title {
+	background-color: #ffc107;
+}
+
+.row .card-panel:nth-child(3) .title {
+	background-color: #bdbdbd;
+}
