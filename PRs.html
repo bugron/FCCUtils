@@ -2,146 +2,146 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<title>FreeCodeCamp's Pull Requests</title>
-	<script src="js/jquery-2.1.1.min.js"></script>
-	<script src="js/pace/pace.min.js"></script>
+  <meta charset="utf-8">
+  <title>FreeCodeCamp's Pull Requests</title>
+  <script src="js/jquery-2.1.1.min.js"></script>
+  <script src="js/pace/pace.min.js"></script>
     <link href="css/pace/pace-index.css" rel="stylesheet">
     <link href="css/github.css" rel="stylesheet">
-	<style>
-		#issue-closed {
-			margin-bottom:100px;
-		}
-		
-		#contributors {
-			margin-top:30px;
-		}
-	</style>
+  <style>
+    #issue-closed {
+      margin-bottom:100px;
+    }
+    
+    #contributors {
+      margin-top:30px;
+    }
+  </style>
 </head>
 
 <body>
-	<header>
-		<h1>FreeCodeCamp's Pull Requests</h1>
-	</header>
-	<ul id="contributors"></ul>
+  <header>
+    <h1>FreeCodeCamp's Pull Requests</h1>
+  </header>
+  <ul id="contributors"></ul>
 
-	<footer>
-		<a href="https://kovshenin.com/2012/how-to-get-a-list-of-contributors-from-a-github-project/#comment-10535">Inspired by Joseph Scott</a><br>
-		<a href="https://api.github.com">Powered by GitHub API</a>
-	</footer>
+  <footer>
+    <a href="https://kovshenin.com/2012/how-to-get-a-list-of-contributors-from-a-github-project/#comment-10535">Inspired by Joseph Scott</a><br>
+    <a href="https://api.github.com">Powered by GitHub API</a>
+  </footer>
 
-	<script>
-		$(document).ready(function() {
-			function getPulls(opts) {
-			    opts.data = opts.data || [];
-			    opts.page = opts.page || 1;
-			    var url = 'https://api.github.com/repos/' + opts.username + '/' + opts.repo;
-			    url += '/pulls?callback=?&page=' + opts.page + '&per_page=100&state=' + opts.state;
-			    url += '&access_token=YOUR_TOKEN_HERE';
-			    $.ajax(url, {
-			        dataType: 'jsonp',
-			        success: function(res) {
-			            if (res.meta && res.meta.status === '403') {
-			                return opts.error(res.data);
-			            }
-			            opts.data = $.merge(opts.data, res.data);
-			            if(res.meta && res.meta.Link && res.meta.Link[0][1].rel === 'next'){
-		                    opts.page++; 
-		                    getPulls(opts);
-			            } else {
-				            opts.success(opts.data);
-				        }
-			        }
-			    });
-			}
+  <script>
+    $(document).ready(function() {
+      function getPulls(opts) {
+        opts.data = opts.data || [];
+        opts.page = opts.page || 1;
+        var url = 'https://api.github.com/repos/' + opts.username + '/' + opts.repo;
+        url += '/pulls?callback=?&page=' + opts.page + '&per_page=100&state=' + opts.state;
+        url += '&access_token=YOUR_TOKEN_HERE';
+        $.ajax(url, {
+          dataType: 'jsonp',
+          success: function(res) {
+            if (res.meta && res.meta.status === '403') {
+              return opts.error(res.data);
+            }
+            opts.data = $.merge(opts.data, res.data);
+            if(res.meta && res.meta.Link && res.meta.Link[0][1].rel === 'next'){
+              opts.page++; 
+              getPulls(opts);
+            } else {
+              opts.success(opts.data);
+            }
+          }
+        });
+      }
 
-			var html = '', arrFiles = [], arrLines = [],
-			regex1 = "\\-\\-\\-\\s*(.*)\\s*\\+\\+\\+", rx1 = new RegExp(regex1, 'i'),
-			regex2 = "\\@\\@\\s*(.*)\\s*\\@\\@", rx2 = new RegExp(regex2, 'ig'),
-			obj = {
-			    username: 'freecodecamp',
-			    repo: 'freecodecamp',
-			    state: 'open',
-			    success: function(pulls) {
-			        $('#contributors').empty();
-	                type = 'git-pull-request';
-			        $.each(pulls, function(i, pull) {
-			            var state = pull.state;
-		                if (pull.state === 'open') {
-							$.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' +
-							pull.number + '?access_token=YOUR_TOKEN_HERE', 
-							{
-								async: false,
-                                success: function(currPull) {
-									if (currPull.mergeable === false) {
-										state = 'conflicts';
-									}
-								}
-							});
-							// get open prs' diffs
-							$.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' + pull.number + '?access_token=YOUR_TOKEN_HERE', 
-							{
-								beforeSend: function (xhr) { xhr.setRequestHeader ('Accept', 'application/vnd.github.diff') },
-								async: false,
-                                success: function(currPull) {
-                                    arrFiles.push(currPull.match(rx1)[1].trim().replace('a/', '').replace('b/', ''));
-                                    arrLines.push(currPull.match(rx2));
-								}
-							});
-						} else if (pull.merged_at !== null) {
-							state = 'merged';
-						}
+      var html = '', arrFiles = [], arrLines = [],
+      regex1 = "\\-\\-\\-\\s*(.*)\\s*\\+\\+\\+", rx1 = new RegExp(regex1, 'i'),
+      regex2 = "\\@\\@\\s*(.*)\\s*\\@\\@", rx2 = new RegExp(regex2, 'ig'),
+      obj = {
+          username: 'freecodecamp',
+          repo: 'freecodecamp',
+          state: 'open',
+          success: function(pulls) {
+              $('#contributors').empty();
+                  type = 'git-pull-request';
+              $.each(pulls, function(i, pull) {
+                var state = pull.state;
+                if (pull.state === 'open') {
+              	  $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' +
+              	  pull.number + '?access_token=YOUR_TOKEN_HERE', 
+              	  {
+              	    async: false,
+              	                    success: function(currPull) {
+              	      if (currPull.mergeable === false) {
+              	        state = 'conflicts';
+              	      }
+              	    }
+              	  });
+              	  // get open prs' diffs
+              	  $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' + pull.number + '	  ?access_token=YOUR_TOKEN_HERE', 
+              	  {
+              	    beforeSend: function (xhr) { xhr.setRequestHeader ('Accept', 'application/vnd.github.diff') },
+              	    async: false,
+              	                    success: function(currPull) {
+              	                        arrFiles.push(currPull.match(rx1)[1].trim().replace('a/', '').replace('b/', ''));
+              	                        arrLines.push(currPull.match(rx2));
+              	    }
+              	  });
+                } else if (pull.merged_at !== null) {
+                  state = 'merged';
+                }
 
-			            html += '<li><a href="' + pull.html_url + '" title="Created by @' + pull.user.login + ' at ' + pull.created_at + '" target="_blank">' + 
-			            '<div class="flex-table-item"><div class="state state-' + state + '"><span class="octicon octicon-' + type + '"></span> ' + 
-			            pull.number + '</div></div></a></li>';
-			        });
-			        $('#contributors').append(html);
-			        /*console.log(arrFiles);
-			        console.log(arrLines);*/
-			        var j, newColor;
-			        for(var i = 0; i < arrFiles.length; i++) {
-			            for(j = i + 1; j < arrFiles.length; j++) {
-			                if(arrFiles[i] === arrFiles[j]) {
-			                    console.log('-------------');
-			                    console.log('arrFiles #' + i + ': ', arrFiles[i]);
-			                    console.log('arrFiles #' + j + ': ', arrFiles[j]);
-			                    console.log('arrLines #' + i + ': ', arrLines[i]);
-			                    console.log('arrLines #' + j + ': ', arrLines[j]);
-			                    for(var k = 0; k < arrLines[i].length; k++) {
-			                        for(var f = 0; f < arrLines[j].length; f++) {
-				                        if (Math.abs(Number(arrLines[i][k].match(/-\d+,\d+/)[0].replace(',', '.')) - Number(arrLines[j][f].match(/-\d+,\d+/)[0].replace(',', '.'))) < 1) {
-				                            console.log('~~~~~~~~~~~~CONFLICTS!~~~~~~~~~~~~');
-				                            for(var l = 0; l < 5; l++) {
-				                                newColor = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1,6);
-				                            }
-				                            var title1 = $('#contributors li:nth-child(' + (i + 1) + ') .state').parent().parent().attr('title'),
-				                            val1 = $('#contributors li:nth-child(' + (i + 1) + ') .state').text(),
-				                            title2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').parent().parent().attr('title'),
-				                            val2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').text();
-				                            
-				                            $('#contributors li:nth-child(' + (i + 1) + ') .state').css({'background-color': newColor});
-				                            $('#contributors li:nth-child(' + (i + 1) + ') .state').css({'color': 'black'});
-				                            $('#contributors li:nth-child(' + (i + 1) + ') .state').parent().parent().attr('title', title1 + '. Possible conflicts with' + val2);
-				                            
-				                            $('#contributors li:nth-child(' + (j + 1) + ') .state').css({'background-color': newColor});
-				                            $('#contributors li:nth-child(' + (j + 1) + ') .state').css({'color': 'black'});
-				                            $('#contributors li:nth-child(' + (j + 1) + ') .state').parent().parent().attr('title', title2 + '. Possible conflicts with' + val1);
-				                        }
-			                        }
-			                    }
-			                }
-			            }
-			        }
-			    },
-			    error: function(jqXHR, textStatus, errorThrown) {
-				    console.log("Request failed: " + textStatus);
-				    console.log(errorThrown);
-				}
-			};
+                html += '<li><a href="' + pull.html_url + '" title="Created by @' + pull.user.login + ' at ' + pull.created_at + '" target="_blank">' + 
+                '<div class="flex-table-item"><div class="state state-' + state + '"><span class="octicon octicon-' + type + '"></span> ' + 
+                pull.number + '</div></div></a></li>';
+              });
+              $('#contributors').append(html);
+              /*console.log(arrFiles);
+              console.log(arrLines);*/
+              var j, newColor;
+              for(var i = 0; i < arrFiles.length; i++) {
+                for(j = i + 1; j < arrFiles.length; j++) {
+                  if(arrFiles[i] === arrFiles[j]) {
+                    console.log('-------------');
+                    console.log('arrFiles #' + i + ': ', arrFiles[i]);
+                    console.log('arrFiles #' + j + ': ', arrFiles[j]);
+                    console.log('arrLines #' + i + ': ', arrLines[i]);
+                    console.log('arrLines #' + j + ': ', arrLines[j]);
+                    for(var k = 0; k < arrLines[i].length; k++) {
+                      for(var f = 0; f < arrLines[j].length; f++) {
+                        if (Math.abs(Number(arrLines[i][k].match(/-\d+,\d+/)[0].replace(',', '.')) - Number(arrLines[j][f].match(/-\d+,\d+/)[0].replace(',', '.'))) < 1) {
+                          console.log('~~~~~~~~~~~~CONFLICTS!~~~~~~~~~~~~');
+                          for(var l = 0; l < 5; l++) {
+                              newColor = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1,6);
+                          }
+                          var title1 = $('#contributors li:nth-child(' + (i + 1) + ') .state').parent().parent().attr('title'),
+                          val1 = $('#contributors li:nth-child(' + (i + 1) + ') .state').text(),
+                          title2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').parent().parent().attr('title'),
+                          val2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').text();
+                          
+                          $('#contributors li:nth-child(' + (i + 1) + ') .state').css({'background-color': newColor});
+                          $('#contributors li:nth-child(' + (i + 1) + ') .state').css({'color': 'black'});
+                          $('#contributors li:nth-child(' + (i + 1) + ') .state').parent().parent().attr('title', title1 + '. Possible conflicts with' + val2);
+                          
+                          $('#contributors li:nth-child(' + (j + 1) + ') .state').css({'background-color': newColor});
+                          $('#contributors li:nth-child(' + (j + 1) + ') .state').css({'color': 'black'});
+                          $('#contributors li:nth-child(' + (j + 1) + ') .state').parent().parent().attr('title', title2 + '. Possible conflicts with' + val1);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Request failed: " + textStatus);
+            console.log(errorThrown);
+        }
+      };
 
-			getPulls(obj);
-		});
-	</script>
+      getPulls(obj);
+    });
+  </script>
 </body>
 </html>
