@@ -6,8 +6,9 @@
   <title>FreeCodeCamp's Pull Requests</title>
   <script src="js/jquery-2.1.1.min.js"></script>
   <script src="js/pace/pace.min.js"></script>
-    <link href="css/pace/pace-index.css" rel="stylesheet">
-    <link href="css/github.css" rel="stylesheet">
+  <script src="js/PrDiffFetchAndParse.js"></script>
+  <link href="css/pace/pace-index.css" rel="stylesheet">
+  <link href="css/github.css" rel="stylesheet">
   <style>
     #issue-closed {
       margin-bottom:100px;
@@ -32,6 +33,18 @@
 
   <script>
     $(document).ready(function() {
+      function formatTitle(index, title, ColorBack, ColorText, searchVal) {
+        $('#contributors li:nth-child(' + (index + 1) + ') .state').css({'background-color': ColorBack});
+        $('#contributors li:nth-child(' + (index + 1) + ') .state').css({'color': ColorText});
+        if(title.match(/Possible conflict\(s\) with/ig))  {
+          if(!title.match(searchVal))
+            $('#contributors li:nth-child(' + (index + 1) + ') .state').parent().parent().attr('title', title + ', ' + searchVal);
+        }
+        else {
+          $('#contributors li:nth-child(' + (index + 1) + ') .state').parent().parent().attr('title', title + '. Possible conflict(s) with' + searchVal);
+        }
+      }
+
       function getPulls(opts) {
         opts.data = opts.data || [];
         opts.page = opts.page || 1;
@@ -55,88 +68,102 @@
         });
       }
 
-      var html = '', arrFiles = [], arrLines = [],
-      regex1 = "\\-\\-\\-\\s*(.*)\\s*\\+\\+\\+", rx1 = new RegExp(regex1, 'i'),
-      regex2 = "\\@\\@\\s*(.*)\\s*\\@\\@", rx2 = new RegExp(regex2, 'ig'),
+      var html = '', diffParse = [],
       obj = {
-          username: 'freecodecamp',
-          repo: 'freecodecamp',
-          state: 'open',
-          success: function(pulls) {
-              $('#contributors').empty();
-                  type = 'git-pull-request';
-              $.each(pulls, function(i, pull) {
-                var state = pull.state;
-                if (pull.state === 'open') {
-              	  $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' +
-              	  pull.number + '?access_token=YOUR_TOKEN_HERE', 
-              	  {
-              	    async: false,
-              	                    success: function(currPull) {
-              	      if (currPull.mergeable === false) {
-              	        state = 'conflicts';
-              	      }
-              	    }
-              	  });
-              	  // get open prs' diffs
-              	  $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' + pull.number + '	  ?access_token=YOUR_TOKEN_HERE', 
-              	  {
-              	    beforeSend: function (xhr) { xhr.setRequestHeader ('Accept', 'application/vnd.github.diff') },
-              	    async: false,
-              	                    success: function(currPull) {
-              	                        arrFiles.push(currPull.match(rx1)[1].trim().replace('a/', '').replace('b/', ''));
-              	                        arrLines.push(currPull.match(rx2));
-              	    }
-              	  });
-                } else if (pull.merged_at !== null) {
-                  state = 'merged';
-                }
+        username: 'freecodecamp',
+        repo: 'freecodecamp',
+        state: 'open',
+        success: function(pulls) {
+            $('#contributors').empty();
+                type = 'git-pull-request';
+            $.each(pulls, function(i, pull) {
+              var state = pull.state;
+              if (pull.state === 'open') {
+            	  $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' +
+            	  pull.number + '?access_token=YOUR_TOKEN_HERE', 
+            	  {
+            	    async: false,
+            	    success: function(currPull) {
+            	      if (currPull.mergeable === false) {
+            	        state = 'conflicts';
+            	      }
+            	    }
+            	  });
+            	  // get open prs' diffs
+            	  $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' + pull.number + '?access_token=YOUR_TOKEN_HERE', 
+            	  {
+            	    beforeSend: function (xhr) { xhr.setRequestHeader ('Accept', 'application/vnd.github.diff') },
+            	    async: false,
+            	    success: function(currPull) {
+                    diffParse.push(parseDiff(currPull));
+            	    }
+            	  });
+              } else if (pull.merged_at !== null) {
+                state = 'merged';
+              }
 
-                html += '<li><a href="' + pull.html_url + '" title="Created by @' + pull.user.login + ' at ' + pull.created_at + '" target="_blank">' + 
-                '<div class="flex-table-item"><div class="state state-' + state + '"><span class="octicon octicon-' + type + '"></span> ' + 
-                pull.number + '</div></div></a></li>';
-              });
-              $('#contributors').append(html);
-              /*console.log(arrFiles);
-              console.log(arrLines);*/
-              var j, newColor;
-              for(var i = 0; i < arrFiles.length; i++) {
-                for(j = i + 1; j < arrFiles.length; j++) {
-                  if(arrFiles[i] === arrFiles[j]) {
-                    console.log('-------------');
-                    console.log('arrFiles #' + i + ': ', arrFiles[i]);
-                    console.log('arrFiles #' + j + ': ', arrFiles[j]);
-                    console.log('arrLines #' + i + ': ', arrLines[i]);
-                    console.log('arrLines #' + j + ': ', arrLines[j]);
-                    for(var k = 0; k < arrLines[i].length; k++) {
-                      for(var f = 0; f < arrLines[j].length; f++) {
-                        if (Math.abs(Number(arrLines[i][k].match(/-\d+,\d+/)[0].replace(',', '.')) - Number(arrLines[j][f].match(/-\d+,\d+/)[0].replace(',', '.'))) < 1) {
-                          console.log('~~~~~~~~~~~~CONFLICTS!~~~~~~~~~~~~');
-                          for(var l = 0; l < 5; l++) {
-                              newColor = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1,6);
-                          }
-                          var title1 = $('#contributors li:nth-child(' + (i + 1) + ') .state').parent().parent().attr('title'),
-                          val1 = $('#contributors li:nth-child(' + (i + 1) + ') .state').text(),
-                          title2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').parent().parent().attr('title'),
-                          val2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').text();
-                          
-                          $('#contributors li:nth-child(' + (i + 1) + ') .state').css({'background-color': newColor});
-                          $('#contributors li:nth-child(' + (i + 1) + ') .state').css({'color': 'black'});
-                          $('#contributors li:nth-child(' + (i + 1) + ') .state').parent().parent().attr('title', title1 + '. Possible conflicts with' + val2);
-                          
-                          $('#contributors li:nth-child(' + (j + 1) + ') .state').css({'background-color': newColor});
-                          $('#contributors li:nth-child(' + (j + 1) + ') .state').css({'color': 'black'});
-                          $('#contributors li:nth-child(' + (j + 1) + ') .state').parent().parent().attr('title', title2 + '. Possible conflicts with' + val1);
+              html += '<li><a href="' + pull.html_url + '" title="Created by @' + pull.user.login + ' at ' + pull.created_at + '" target="_blank">' + 
+              '<div class="flex-table-item"><div class="state state-' + state + '"><span class="octicon octicon-' + type + '"></span> ' + 
+              pull.number + '</div></div></a></li>';
+            });
+            $('#contributors').append(html);
+
+            var newColorBack, newColorText;
+            for(var l = 0; l < 5; l++) {
+              newColorBack = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1,6);
+              newColorText = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1,6);
+            }
+
+            var isConflict, logLinesAdd = '', logLinesDel ='';
+            for(var i = 0; i < diffParse.length; i++) { //Parse throught diffParse's objects
+              for(var j = i + 1; j < diffParse.length; j++) { //Parse throught diffParse's objects
+                for(var l = 0; l < diffParse[i].length; l++) { //An array of objects (Array [ Object, [Object]]) containing changed lines 
+                  for(var m = 0; m < diffParse[j].length; m++) { //An object like this: {addedLines[], deletedLines[], path(string)}
+                    isConflict = false;
+                    if(diffParse[i][l].path === diffParse[j][m].path) { //Check if both object refer to the same file
+                      logLinesDel = "Deleted line(s) in both: ";
+                      for(var it = 0; it < diffParse[i][l]["deletedLines"].length; it++) {
+                        if(diffParse[j][m]["deletedLines"].indexOf(diffParse[i][l]["deletedLines"][it]) !== -1) {
+                          logLinesDel = logLinesDel + diffParse[i][l]["deletedLines"][it] + ' ';
+                          isConflict |= true;
                         }
+                      }
+      
+                      logLinesAdd = "Added line(s) in both: ";
+                      for(var it = 0; it < diffParse[i][l]["addedLines"].length; it++) {
+                        if(diffParse[j][m]["addedLines"].indexOf(diffParse[i][l]["addedLines"][it]) !== -1) {
+                          logLinesAdd = logLinesAdd + diffParse[i][l]["addedLines"][it] + ' ';
+                          isConflict |= true;
+                        }
+                      }
+      
+                      if(isConflict) {
+                        console.warn("Same paths: ", diffParse[i][l].path);
+                        console.info('diffParse #' + i + ': ', diffParse[i]);
+                        console.info('diffParse #' + j + ': ', diffParse[j]);
+                        if (logLinesDel !== "Deleted line(s) in both: ")
+                          console.log(logLinesDel);
+                        if (logLinesAdd !== "Added line(s) in both: ")
+                          console.log(logLinesAdd);
+                        console.warn('~~~~~~~~~~~~CONFLICTS!~~~~~~~~~~~~');
+
+                        var title1 = $('#contributors li:nth-child(' + (i + 1) + ') .state').parent().parent().attr('title'),
+                        val1 = $('#contributors li:nth-child(' + (i + 1) + ') .state').text(),
+                        title2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').parent().parent().attr('title'),
+                        val2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').text();
+                        
+                        formatTitle(i, title1, newColorBack, newColorText, val2);
+                        formatTitle(j, title2, newColorBack, newColorText, val1);
                       }
                     }
                   }
                 }
               }
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            console.log("Request failed: " + textStatus);
-            console.log(errorThrown);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log("Request failed: " + textStatus);
+          console.log(errorThrown);
         }
       };
 

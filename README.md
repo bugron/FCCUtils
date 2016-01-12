@@ -5,14 +5,10 @@ Tools for FreeCodeCamp's Issue Moderators/Owners.
 Gets FreeCodeCamp's contributors' list.
 
 ## Issues
-Lists **all** issues (including pull requests) of FreeCodeCamp repository. Allows to sort them by categories (open/closed issues, open/closed/mereged PRs).
+Lists **all** issues (including pull requests) of FreeCodeCamp repository. Allows to sort them by categories (open/closed issues, open/closed/merged PRs).
 
 ## PRs
-Lists all open pull requests of FreeCodeCamp repository.
-
-***ToDo***
-
-1. Identify PRs which may cause merge conflcts.
+Lists all open pull requests of FreeCodeCamp repository. Identifies PRs which may cause merge conflicts.
 
 ## Notifications
 A tools for getting FreeCodeCamp's GitHub notifications. Uses Notifications Web API.
