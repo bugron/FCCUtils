@@ -2,197 +2,197 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<title>FreeCodeCamp's GitHub Issues</title>
-	<script src="js/jquery-2.1.1.min.js"></script>
-	<script src="js/pace/pace.min.js"></script>
-    <link href="css/pace/pace-index.css" rel="stylesheet">
-    <link href="css/github.css" rel="stylesheet">
-	<style>
-		#issue-closed {
-			margin-bottom:100px;
-		}
-		
-		#contributors {
-			margin-top:30px;
-		}
-	</style>
+  <meta charset="utf-8">
+  <title>FreeCodeCamp's GitHub Issues</title>
+  <script src="js/jquery-2.1.1.min.js"></script>
+  <script src="js/pace/pace.min.js"></script>
+  <link href="css/pace/pace-index.css" rel="stylesheet">
+  <link href="css/github.css" rel="stylesheet">
+  <style>
+    #issue-closed {
+      margin-bottom:100px;
+    }
+
+    #contributors {
+      margin-top:30px;
+    }
+  </style>
 </head>
 
 <body>
-	<header>
-		<h1>FreeCodeCamp's GitHub Issues</h1>
-	</header>
-	<button class='btn btn-outline btn-half-block' style="float:left;" id='sort'>Sort all issues and PRs</button>
-	<button class='btn btn-danger btn-half-block' style="float:left;" id='mix'>Mix all issues and PRs</button>
-	<ul id="contributors"></ul>
-	
-	<ul id="issue-open"></ul>
-	<ul id="pr-open"></ul>
-	<ul id="pr-merged"></ul>
-	<ul id="pr-closed"></ul>
-	<ul id="issue-closed"></ul>
-	
-	<footer>
-		<a href="https://kovshenin.com/2012/how-to-get-a-list-of-contributors-from-a-github-project/#comment-10535">Inspired by Joseph Scott</a><br>
-		<a href="https://api.github.com">Powered by GitHub API</a>
-	</footer>
+  <header>
+    <h1>FreeCodeCamp's GitHub Issues</h1>
+  </header>
+  <button class='btn btn-outline btn-half-block' style="float:left;" id='sort'>Sort all issues and PRs</button>
+  <button class='btn btn-danger btn-half-block' style="float:left;" id='mix'>Mix all issues and PRs</button>
+  <ul id="contributors"></ul>
+  
+  <ul id="issue-open"></ul>
+  <ul id="pr-open"></ul>
+  <ul id="pr-merged"></ul>
+  <ul id="pr-closed"></ul>
+  <ul id="issue-closed"></ul>
 
-	<script>
-		/*
-		function check() {
-			setTimeout(function () {
-				//do something here
-				check();
-			}, 10000) // refresh every 10 seconds
-		}
-		check();
-		*/
-		
-		$(document).ready(function() {
-			$('#sort').on('click', function() {
-				$('#contributors li').each(function(i, li) {
-					if ($(li).find(".octicon-issue-opened").length) {
-						$(li).appendTo("#issue-open");
-					} else if ($(li).find(".octicon-issue-closed").length) {
-						$(li).appendTo("#issue-closed");
-					} else if ($(li).find(".octicon-git-pull-request").length) {
-						if ($(li).find(".state-open").length || $(li).find(".state-conflicts").length) {
-							$(li).appendTo("#pr-open");
-						} else if ($(li).find(".state-merged").length) {
-							$(li).appendTo("#pr-merged");
-						} else if ($(li).find(".state-closed").length) {
-							$(li).appendTo("#pr-closed");
-						}
-					}
-				});
-			});
+  <footer>
+    <a href="https://kovshenin.com/2012/how-to-get-a-list-of-contributors-from-a-github-project/#comment-10535">Inspired by Joseph Scott</a><br>
+    <a href="https://api.github.com">Powered by GitHub API</a>
+  </footer>
 
-			var backup;
-			$('#mix').on('click', function() {
-				$('ul').not('#contributors').each(function() {
-					$(this).empty();
-				});
-				$('#contributors').html(backup);
-			});
+  <script>
+    /*
+    function check() {
+      setTimeout(function () {
+        //do something here
+        check();
+      }, 10000) // refresh every 10 seconds
+    }
+    check();
+    */
 
-			function getIssues(opts) {
-			    opts.data = opts.data || [];
-			    opts.page = opts.page || 1;
-			    var url = 'https://api.github.com/repos/' + opts.username + '/' + opts.repo;
-			    url += '/issues?callback=?&page=' + opts.page + '&per_page=100&state=' + opts.state;
-			    url += '&access_token=YOUR_TOKEN_HERE';
-			    $.ajax(url, {
-			        dataType: 'jsonp',
-			        success: function(res) {
-			            if (res.meta && res.meta.status === '403') {
-			                return opts.error(res.data);
-			            }
-			            opts.data = $.merge(opts.data, res.data);
-			            if (res.meta && res.meta.Link) {
-			                if (res.meta.Link[0][1].rel === 'next') {
-			                    opts.page++;
-			                    getIssues(opts)
-			                } else {
-			                    opts.success(opts.data);
-			                }
-			            }
-			        }
-			    });
-			}
+    $(document).ready(function() {
+      $('#sort').on('click', function() {
+        $('#contributors li').each(function(i, li) {
+          if ($(li).find(".octicon-issue-opened").length) {
+            $(li).appendTo("#issue-open");
+          } else if ($(li).find(".octicon-issue-closed").length) {
+            $(li).appendTo("#issue-closed");
+          } else if ($(li).find(".octicon-git-pull-request").length) {
+            if ($(li).find(".state-open").length || $(li).find(".state-conflicts").length) {
+              $(li).appendTo("#pr-open");
+            } else if ($(li).find(".state-merged").length) {
+              $(li).appendTo("#pr-merged");
+            } else if ($(li).find(".state-closed").length) {
+              $(li).appendTo("#pr-closed");
+            }
+          }
+        });
+      });
 
-			var pulls;
-			function getPulls(opts) {
-			    opts.data = opts.data || [];
-			    opts.page = opts.page || 1;
-			    var url = 'https://api.github.com/repos/' + opts.username + '/' + opts.repo;
-			    url += '/pulls?callback=?&page=' + opts.page + '&per_page=100&state=' + opts.state;
-			    url += '&access_token=YOUR_TOKEN_HERE';
-			    $.ajax(url, {
-			        dataType: 'jsonp',
-			        success: function(res) {
-			            if (res.meta && res.meta.status === '403') {
-			                return opts.error(res.data);
-			            }
-			            opts.data = $.merge(opts.data, res.data);
-			            if (res.meta && res.meta.Link) {
-			                if (res.meta.Link[0][1].rel === 'next') {
-			                    opts.page++; 
-			                    getPulls(opts);
-			                } else {
-			                    pulls = opts.data;
-			                }
-			            }
-			        }
-			    });
-			}
+      var backup;
+      $('#mix').on('click', function() {
+        $('ul').not('#contributors').each(function() {
+          $(this).empty();
+        });
+        $('#contributors').html(backup);
+      });
 
-			var html = '';
-			var obj = {
-			    username: 'freecodecamp',
-			    repo: 'freecodecamp',
-			    state: 'all',
-			    success: function(issue) {
-			        $('#contributors').empty();
-			        $.each(issue, function(i, issue) {
-			            var state = issue.state;
-		                var type = '';
-			            if (issue.pull_request !== undefined) {
-			                type = 'git-pull-request';
-			                if (issue.state === 'open') {
-								$.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' +
-								issue.number + '?access_token=YOUR_TOKEN_HERE', {
-								async: false,
-                                success: function(currPull) {
-									console.log(currPull.mergeable);
-									if (currPull.mergeable === false) {
-										state = 'conflicts';
-									}
-								}
-								});
-							} else {
-								$.each(pulls, function(i, pull) {
-									if (pull.number === issue.number && pull.merged_at !== null) {
-										state = 'merged';
-										return false;
-									}
-								});
-							}
-			            }
-			            else if (state === 'open') {
-			                type = 'issue-opened';
-			            }
-			            else if (state === 'closed') {
-			                type = 'issue-closed';
-			            }
-			            html += '<li><a href="' + issue.html_url + '" title="Created by @' + issue.user.login + ' at ' + issue.created_at + '" target="_blank">' + 
-			            '<div class="flex-table-item"><div class="state state-' + state + '"><span class="octicon octicon-' + type + '"></span> ' + 
-			            issue.number + '</div></div></a></li>';
-			            
-			        });
-		            $('#contributors').append(html);
-			        backup = $('#contributors').html();
-			    },
-			    error: function(jqXHR, textStatus, errorThrown) {
-				    console.log("Request failed: " + textStatus);
-				    console.log(errorThrown);
-				}
-			};
-			
-			if (obj.state !== 'open') {
-				getPulls({
-				    username: obj.username,
-				    repo: obj.repo,
-				    state: 'closed', // don't change the state
-				    error: function(jqXHR, textStatus, errorThrown) {
-					    console.log("Request failed: " + textStatus);
-					    console.log(errorThrown);
-					}
-				});
-			}
-			
-			getIssues(obj);
-		});
-	</script>
+      function getIssues(opts) {
+        opts.data = opts.data || [];
+        opts.page = opts.page || 1;
+        var url = 'https://api.github.com/repos/' + opts.username + '/' + opts.repo;
+        url += '/issues?callback=?&page=' + opts.page + '&per_page=100&state=' + opts.state;
+        url += '&access_token=YOUR_TOKEN_HERE';
+        $.ajax(url, {
+          dataType: 'jsonp',
+          success: function(res) {
+            if (res.meta && res.meta.status === '403') {
+              return opts.error(res.data);
+            }
+            opts.data = $.merge(opts.data, res.data);
+            if (res.meta && res.meta.Link) {
+              if (res.meta.Link[0][1].rel === 'next') {
+                opts.page++;
+                getIssues(opts)
+              } else {
+                opts.success(opts.data);
+              }
+            }
+          }
+        });
+      }
+
+      var pulls;
+      function getPulls(opts) {
+        opts.data = opts.data || [];
+        opts.page = opts.page || 1;
+        var url = 'https://api.github.com/repos/' + opts.username + '/' + opts.repo;
+        url += '/pulls?callback=?&page=' + opts.page + '&per_page=100&state=' + opts.state;
+        url += '&access_token=YOUR_TOKEN_HERE';
+        $.ajax(url, {
+          dataType: 'jsonp',
+          success: function(res) {
+            if (res.meta && res.meta.status === '403') {
+              return opts.error(res.data);
+            }
+            opts.data = $.merge(opts.data, res.data);
+            if (res.meta && res.meta.Link) {
+              if (res.meta.Link[0][1].rel === 'next') {
+                opts.page++; 
+                getPulls(opts);
+              } else {
+                pulls = opts.data;
+              }
+            }
+          }
+        });
+      }
+
+      var html = '';
+      var obj = {
+        username: 'freecodecamp',
+        repo: 'freecodecamp',
+        state: 'all',
+        success: function(issue) {
+          $('#contributors').empty();
+          $.each(issue, function(i, issue) {
+            var state = issue.state;
+            var type = '';
+            if (issue.pull_request !== undefined) {
+              type = 'git-pull-request';
+              if (issue.state === 'open') {
+                $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' +
+                issue.number + '?access_token=YOUR_TOKEN_HERE', {
+                async: false,
+                success: function(currPull) {
+                  console.log(currPull.mergeable);
+                  if (currPull.mergeable === false) {
+                    state = 'conflicts';
+                  }
+                }
+                });
+              } else {
+                $.each(pulls, function(i, pull) {
+                  if (pull.number === issue.number && pull.merged_at !== null) {
+                    state = 'merged';
+                    return false;
+                  }
+                });
+              }
+            }
+            else if (state === 'open') {
+              type = 'issue-opened';
+            }
+            else if (state === 'closed') {
+              type = 'issue-closed';
+            }
+            html += '<li><a href="' + issue.html_url + '" title="Created by @' + issue.user.login + ' at ' + issue.created_at + '" target="_blank">' + 
+            '<div class="flex-table-item"><div class="state state-' + state + '"><span class="octicon octicon-' + type + '"></span> ' + 
+            issue.number + '</div></div></a></li>';
+            
+          });
+          $('#contributors').append(html);
+          backup = $('#contributors').html();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log("Request failed: " + textStatus);
+          console.log(errorThrown);
+        }
+      };
+
+      if (obj.state !== 'open') {
+        getPulls({
+          username: obj.username,
+          repo: obj.repo,
+          state: 'closed', // don't change the state
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Request failed: " + textStatus);
+            console.log(errorThrown);
+          }
+        });
+      }
+
+      getIssues(obj);
+    });
+  </script>
 </body>
 </html>

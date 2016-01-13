@@ -79,25 +79,25 @@
             $.each(pulls, function(i, pull) {
               var state = pull.state;
               if (pull.state === 'open') {
-            	  $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' +
-            	  pull.number + '?access_token=YOUR_TOKEN_HERE', 
-            	  {
-            	    async: false,
-            	    success: function(currPull) {
-            	      if (currPull.mergeable === false) {
-            	        state = 'conflicts';
-            	      }
-            	    }
-            	  });
-            	  // get open prs' diffs
-            	  $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' + pull.number + '?access_token=YOUR_TOKEN_HERE', 
-            	  {
-            	    beforeSend: function (xhr) { xhr.setRequestHeader ('Accept', 'application/vnd.github.diff') },
-            	    async: false,
-            	    success: function(currPull) {
+                $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' +
+                pull.number + '?access_token=YOUR_TOKEN_HERE', 
+                {
+                  async: false,
+                  success: function(currPull) {
+                    if (currPull.mergeable === false) {
+                      state = 'conflicts';
+                    }
+                  }
+                });
+                // get open prs' diffs
+                $.ajax('https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/pulls/' + pull.number + '?access_token=YOUR_TOKEN_HERE', 
+                {
+                  beforeSend: function (xhr) { xhr.setRequestHeader ('Accept', 'application/vnd.github.diff') },
+                  async: false,
+                  success: function(currPull) {
                     diffParse.push(parseDiff(currPull));
-            	    }
-            	  });
+                  }
+                });
               } else if (pull.merged_at !== null) {
                 state = 'merged';
               }
@@ -128,7 +128,7 @@
                           isConflict |= true;
                         }
                       }
-      
+
                       logLinesAdd = "Added line(s) in both: ";
                       for(var it = 0; it < diffParse[i][l]["addedLines"].length; it++) {
                         if(diffParse[j][m]["addedLines"].indexOf(diffParse[i][l]["addedLines"][it]) !== -1) {
@@ -136,7 +136,7 @@
                           isConflict |= true;
                         }
                       }
-      
+
                       if(isConflict) {
                         console.warn("Same paths: ", diffParse[i][l].path);
                         console.info('diffParse #' + i + ': ', diffParse[i]);
@@ -151,7 +151,7 @@
                         val1 = $('#contributors li:nth-child(' + (i + 1) + ') .state').text(),
                         title2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').parent().parent().attr('title'),
                         val2 = $('#contributors li:nth-child(' + (j + 1) + ') .state').text();
-                        
+
                         formatTitle(i, title1, newColorBack, newColorText, val2);
                         formatTitle(j, title2, newColorBack, newColorText, val1);
                       }

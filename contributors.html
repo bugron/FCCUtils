@@ -2,120 +2,121 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<title>FreeCodeCamp's Contributors List</title>
-	<script src="js/jquery-2.1.1.min.js"></script>
-	<style>
-		* {
-			margin: 0;
-		}
-	
-		body {
-			background: #fff url("https://s3.amazonaws.com/freecodecamp/wide-social-banner.png") no-repeat center center fixed; 
-			-webkit-background-size: cover;
-			-moz-background-size: cover;
-			-o-background-size: cover;
-			background-size: cover;
-		}
-		#contributors {
-			margin: 20px 10px 90px 10px;
-			list-style-type: none;
-		}
-		
-		#contributors li {
-			display: inline-block;
-		}
-		
-		.avatar{
-			border-radius: 50%;
-			border: 3px solid;
-			width: 100px;
-			transition: all .15s ease-in;
-		}
-		
-		.avatar:hover {
-			transform: scale(1.2);
-		}
-		
-		.green-border {
-			border-color: green;
-		}
-		
-		.red-border {
-			border-color: red;
-		}
-		
-		header {
-			padding: 15px;
-			text-align: center;
-		}
-		
-		header, footer {
-			background-color: #4A2B0F;
-		}
-		
-		footer {
-			position: fixed;
-		    left: 0; 
-			bottom: 0;
-			margin:0;
-			line-height: 1.5em;
-			width: 100%;
-			padding: 15px;
-		}
+  <meta charset="utf-8">
+  <title>FreeCodeCamp's Contributors List</title>
+  <script src="js/jquery-2.1.1.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+    }
 
-		footer a, header {
-			font-family: monospace;
-			text-decoration: none;
-			color: #EEE;
-		}
-		
-		footer a {
-			font-size: 1.5em;
-		}
-	</style>
+    body {
+      background: #fff url("https://s3.amazonaws.com/freecodecamp/wide-social-banner.png") no-repeat center center fixed; 
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover;
+    }
+
+    #contributors {
+      margin: 20px 10px 90px 10px;
+      list-style-type: none;
+    }
+
+    #contributors li {
+      display: inline-block;
+    }
+
+    .avatar{
+      border-radius: 50%;
+      border: 3px solid;
+      width: 100px;
+      transition: all .15s ease-in;
+    }
+
+    .avatar:hover {
+      transform: scale(1.2);
+    }
+
+    .green-border {
+      border-color: green;
+    }
+
+    .red-border {
+      border-color: red;
+    }
+
+    header {
+      padding: 15px;
+      text-align: center;
+    }
+
+    header, footer {
+      background-color: #4A2B0F;
+    }
+
+    footer {
+      position: fixed;
+      left: 0; 
+      bottom: 0;
+      margin:0;
+      line-height: 1.5em;
+      width: 100%;
+      padding: 15px;
+    }
+
+    footer a, header {
+      font-family: monospace;
+      text-decoration: none;
+      color: #EEE;
+    }
+
+    footer a {
+      font-size: 1.5em;
+    }
+  </style>
 </head>
 
 <body>
-	<header>
-		<h1>FreeCodeCamp's Contributors List</h1>
-	</header>
-	
-	<ul id="contributors"></ul>
-	
-	<footer>
-		<a href="https://kovshenin.com/2012/how-to-get-a-list-of-contributors-from-a-github-project/#comment-10535">Inspired by Joseph Scott</a><br>
-		<a href="https://api.github.com">Powered by GitHub API</a>
-	</footer>
-	
-	<script>
-		$(document).ready(function() {
-			var colorClass = "";
-			$.ajax({
-			    beforeSend: function (xhr) { xhr.setRequestHeader ('Authorization', 'Token YOUR_TOKEN_HERE') },
-			    type: "GET",
-			    url: "https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/contributors",
-			    dataType: "json"
-			})
-			.done(function(data) {
-		        $.each(data, function(i, user) {
-		            var html = '<li><a href="https://github.com/' + user.login;
-		            html += '" title="@' + user.login + ' with ' + user.contributions;
-		            html += ' contributions">';
-		            if (user.login === "bugron")
-		                colorClass = "green-border";
-		            else
-		                colorClass = "red-border";
-		            html += '<img class="avatar ' + colorClass + '" width="100" heigt="100" src="' + user.avatar_url + '>"</a></li>';
-		               
-		            $('#contributors').append(html);
-		        });
-		    })
-			.fail(function(jqXHR, textStatus, errorThrown) {
-			    console.log("Request failed: " + textStatus);
-			    console.log(errorThrown);
-			});
-		});
-	</script>
+  <header>
+    <h1>FreeCodeCamp's Contributors List</h1>
+  </header>
+
+  <ul id="contributors"></ul>
+
+  <footer>
+    <a href="https://kovshenin.com/2012/how-to-get-a-list-of-contributors-from-a-github-project/#comment-10535">Inspired by Joseph Scott</a><br>
+    <a href="https://api.github.com">Powered by GitHub API</a>
+  </footer>
+  
+  <script>
+    $(document).ready(function() {
+      var colorClass = "";
+      $.ajax({
+        beforeSend: function (xhr) { xhr.setRequestHeader ('Authorization', 'Token YOUR_TOKEN_HERE') },
+        type: "GET",
+        url: "https://api.github.com/repos/FreeCodeCamp/FreeCodeCamp/contributors",
+        dataType: "json"
+      })
+      .done(function(data) {
+        $.each(data, function(i, user) {
+          var html = '<li><a href="https://github.com/' + user.login;
+          html += '" title="@' + user.login + ' with ' + user.contributions;
+          html += ' contributions">';
+          if (user.login === "bugron")
+            colorClass = "green-border";
+          else
+            colorClass = "red-border";
+          html += '<img class="avatar ' + colorClass + '" width="100" heigt="100" src="' + user.avatar_url + '>"</a></li>';
+             
+          $('#contributors').append(html);
+        });
+      })
+      .fail(function(jqXHR, textStatus, errorThrown) {
+        console.log("Request failed: " + textStatus);
+        console.log(errorThrown);
+      });
+    });
+  </script>
 </body>
 </html>
